@@ -1,19 +1,27 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <%- include('../partials/head'); %>
+  <%- include('../partials/head', {title: "Strona Główna"}); %>
 </head>
-<body class="container-fluid">
-
+<body>
 <header>
   <%- include('../partials/header'); %>
 </header>
 
 <main>
-  <div class="jumbotron">
-    <h1>Witamy na stronie sklepu internetowego</h1>
-    <p>Głównym przedmiotem prowadzonej działalności jest skup zbóż, rzepaku i kukurydzy, a także sprzedaż detaliczna i hurtowa nawozów mineralnych, węgla kamiennego i brunatnego. Dodatkowo zajmujemy się sprzedażą pasz, artykułów do produkcji rolnej, artykułów chemicznych i przemysłowych, paliw płynnych (własna stacja paliw w Głuszynie) oraz skupem złomu. Nasza oferta skierowana jest zarówno do małych gospodarstw jak i tych bardzo dużych na terenie całego kraju. Przedsiębiorstwo posiada 7 punktów sprzedaży i skupu w miejscowościach: Głuszyna, Bukowa Śląska, Rychtal, Namysłów, Krzyków, Pawłowice i Szymonków. Firma cały czas rozwija się zwiększając swój kapitał rzeczowy i ludzki. Nasza załoga liczy obecnie 60 pracowników.</p>
-  </div>
+
+<div class="container" id="main-container">
+
+<div class="jumbotron">
+    <h1 class="display-4">Witamy na stronie sklepu!</h1>
+    <p class="lead">This is a simple hero unit, a simple jumbotron-style component for calling extra attention to featured content or information.</p>
+    <hr class="my-4">
+    <p>Zapraszamy do zapoznania się z ofertą sklepu.</p>
+    <a class="btn btn-primary btn-lg" href="/products" role="button">Oferta</a>
+</div>
+
+
+</div>
 </main>
 
 <footer>
