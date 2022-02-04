@@ -275,22 +275,4 @@ const getOrder = async (orderID) =>
   console.log(res);
 }
 
-(async function(){
-  try{
-    await dbInit();
-    await db.authenticate();
-    console.log("Connected successfully");
-    await addProduct("Marchewka", "Takie pomarańczowe warzywo", 10.50, 30);
-    await addProduct("Wódka", "Napój bogów", 50.00, 10);
-    await addUser("Janusz", "janusz@januszex.com", "12345");
-    await addOrder(1, new Array(await getProduct(1), await getProduct(2)));
-    // const januszOrder = await getOrder(1);
-    // console.log(januszOrder);
-  }
-  catch (err){
-    console.log("FUCKED UP!");
-    console.log(err);
-  }
-})();
-
 module.exports = {dbInit, addUser, deleteUser, getUserList, getUser, isAdmin, authenticate, getProductList, getProduct, addProduct, deleteProduct, updateProductQuantity, addOrder, getOrderList, getOrder}
