@@ -128,7 +128,9 @@ async function dbInit(){
   await sequelize.sync();
 };
 
-async function addUser(usernameForm, emailForm, passwordForm, isAdminForm = false){  
+async function addUser(usernameForm, emailForm, passwordForm, isAdminForm = false){
+  if(usernameForm === '' || emailForm === '' || passwordForm === '')
+    return {success: false, message: "Podaj nazwę użytkownika, email oraz hasło"};
   // borrowed from here: https://stackoverflow.com/questions/201323/how-can-i-validate-an-email-address-using-a-regular-expression     
   const emailRegex = new RegExp("^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$");
   if(!emailRegex.test(emailForm))
@@ -270,5 +272,24 @@ const getOrder = async (orderID) =>
   raw: true});
   console.log(res);
 }
+
+(async function(){
+  try{
+    await dbInit();
+    await db.authenticate();
+    // console.log("Connected successfully");
+    // await addProduct("Marchewka", "Takie pomarańczowe warzywo", 10.50, 30);
+    // await addProduct("Wódka", "Napój bogów", 50.00, 10);
+    // await addUser("Janusz", "janusz@januszex.com", "12345");
+    // await addOrder(1, new Array(await getProduct(1), await getProduct(2)));
+    //const januszOrder = await getOrder(1);
+    // console.log(januszOrder);
+    console.log(await addUser("", "ora@labora.pl", "",));
+  }
+  catch (err){
+    console.log("FUCKED UP!");
+    console.log(err);
+  }
+})();
 
 module.exports = {dbInit, addUser, deleteUser, getUserList, getUser, isAdmin, authenticate, getProductList, getProduct, addProduct, deleteProduct, updateProductQuantity, addOrder, getOrderList, getOrder}
