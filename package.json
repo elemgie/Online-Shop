@@ -20,7 +20,10 @@
   },
   "homepage": "https://github.com/elemgie/online-shop#readme",
   "dependencies": {
+    "bcrypt": "^5.0.1",
     "ejs": "^3.1.6",
-    "express": "^4.17.2"
+    "express": "^4.17.2",
+    "sequelize": "^6.15.0",
+    "sqlite3": "^5.0.2"
   }
 }
