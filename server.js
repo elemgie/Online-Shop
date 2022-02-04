@@ -1,6 +1,19 @@
 const express = require('express');
 const app = express();
+const cookieParser = require("cookie-parser");
+const sessions = require('express-session');
 const port = 8080;
+
+const oneDay = 1000 * 60 * 60 * 24;
+
+//session middleware
+app.use(sessions({
+    secret: "F57CE72ECB5C64E6DAA58581A8662",
+    saveUninitialized:true,
+    cookie: { maxAge: oneDay },
+    resave: false
+}));
+
 let productList = [
   {
     id: 'U23093249028409238049',
