@@ -54,7 +54,8 @@ const oneDay = 1000 * 60 * 60 * 24;
 
   app.post('/login', async(req,res) => {
       const body = req.body;
-      const ret = db.authenticate(body.username, body.password);
+      const ret = await db.authenticate(body.username, body.password);
+      console.log(ret);
       if(ret){
         res.redirect(`/login?err=${encodeURIComponent(ret)}`);
       } else {
