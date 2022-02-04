@@ -102,11 +102,6 @@ async function dbInit(){
   }, {sequelize});
   
   OrderProduct.init({
-    id: {
-      type: DataTypes.INTEGER,
-      primaryKey: true,
-      autoIncrement: true
-    },
     productId: {
       type: DataTypes.INTEGER,
     },
@@ -127,8 +122,8 @@ async function dbInit(){
       name: 'userId'
     }
   });
-  Product.belongsToMany(Order, {foreignKey: {name: 'orderId'}, through: 'OrderProducts'});
-  Order.belongsToMany(Product, {foreignKey: {name: 'productId'}, through: 'OrderProducts'});
+  Product.belongsToMany(Order, {foreignKey: {name: 'id'}, through: OrderProduct});
+  Order.belongsToMany(Product, {foreignKey: {name: 'id'}, through: OrderProduct});
   
   await sequelize.sync();
 };
@@ -137,7 +132,7 @@ async function addUser(usernameForm, emailForm, passwordForm, isAdminForm = fals
   // borrowed from here: https://stackoverflow.com/questions/201323/how-can-i-validate-an-email-address-using-a-regular-expression     
   const emailRegex = new RegExp("^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$");
   if(!emailRegex.test(emailForm))
-    return "Podaj poprawny adres email";
+    return {success: false, message: "Podaj poprawny adres email"};
   const uses = await User.findAndCountAll({
     where:{
       [Op.or]:
@@ -146,10 +141,11 @@ async function addUser(usernameForm, emailForm, passwordForm, isAdminForm = fals
     }
   });
   if(uses.count > 0)
-    return "Podana nazwa użytkownika bądź adres email są już w użyciu!";
+    return {success: false, message: "Podana nazwa użytkownika bądź adres email są już w użyciu!"};
   let generatedSalt = bcrypt.genSaltSync();
   let passwordGeneratedHash = bcrypt.hashSync(passwordForm, generatedSalt);
   await User.create({username: usernameForm, email: emailForm, salt: generatedSalt, passwordHash: passwordGeneratedHash, isAdmin: isAdminForm});
+  return {success: true, message: "Zarejestrowano pomyślnie"};
 }
 
 async function authenticate_async(usernameForm, passwordForm){
@@ -159,11 +155,12 @@ async function authenticate_async(usernameForm, passwordForm){
     }
   });
   if(req.length === 0)
-    return false; 
-  return bcrypt.compareSync(passwordForm, req[0].passwordHash);
+    return {success: false, message: "Nie ma takiego użytkownika"}; 
+  let result = bcrypt.compareSync(passwordForm, req[0].passwordHash);
+  return {success: result, message: (result) ? "Zalogowano pomyślnie" : "Błędna nazwa użytkownika lub hasło"};
 }
 
-const authenticate = async (usernameForm, passwordForm) => { await authenticate_async(usernameForm, passwordForm); }
+const authenticate = async (usernameForm, passwordForm) => { return await authenticate_async(usernameForm, passwordForm); }
 
 const isAdmin = async (userId) => {
   const user = await User.findAll({where: {
@@ -252,7 +249,6 @@ const addOrder = async (userID, productList) => {
   let orderID = orderRes.dataValues.id;
   for(let prod of productList){
     prod = prod[0];
-    console.log(prod.id);
     await OrderProduct.create({prodId: prod.id, orderId: orderID, quantity: prod.quantity});
   }
   return 0;
@@ -266,7 +262,7 @@ const getOrder = async (orderID) =>
 {
   let res = await OrderProduct.findAll({ where:
   {
-    orderId: OrderID
+    orderId: orderID
   },
   include: {
     model: Product
@@ -274,23 +270,5 @@ const getOrder = async (orderID) =>
   raw: true});
   console.log(res);
 }
-
-(async function(){
-  try{
-    await dbInit();
-    await db.authenticate();
-    console.log("Connected successfully");
-    await addProduct("Marchewka", "Takie pomarańczowe warzywo", 10.50, 30);
-    await addProduct("Wódka", "Napój bogów", 50.00, 10);
-    await addUser("Janusz", "janusz@januszex.com", "12345");
-    await addOrder(1, new Array(await getProduct(1), await getProduct(2)));
-    // const januszOrder = await getOrder(1);
-    // console.log(januszOrder);
-  }
-  catch (err){
-    console.log("FUCKED UP!");
-    console.log(err);
-  }
-})();
 
 module.exports = {dbInit, addUser, deleteUser, getUserList, getUser, isAdmin, authenticate, getProductList, getProduct, addProduct, deleteProduct, updateProductQuantity, addOrder, getOrderList, getOrder}
