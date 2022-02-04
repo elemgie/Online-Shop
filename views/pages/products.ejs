@@ -8,31 +8,53 @@
   <%- include('../partials/header'); %>
 </header>
 <main>
-    <div class="contianer" style="padding-top: 50px">
-        <div class="list-group">
-            <a href="#" class="list-group-item list-group-item-action flex-column align-items-start active">
-              <div class="d-flex w-100 justify-content-between">
-                <h5 class="mb-1">List group item heading</h5>
-              </div>
-              <p class="mb-1">Donec id elit non mi porta gravida at eget metus. Maecenas sed diam eget risus varius blandit.</p>
-              <small>Donec id elit non mi porta.</small>
-            </a>
-            <a href="#" class="list-group-item list-group-item-action flex-column align-items-start">
-              <div class="d-flex w-100 justify-content-between">
-                <h5 class="mb-1">List group item heading</h5>
-              </div>
-              <p class="mb-1">Donec id elit non mi porta gravida at eget metus. Maecenas sed diam eget risus varius blandit.</p>
-              <small class="text-muted">Donec id elit non mi porta.</small>
-            </a>
-            <a href="#" class="list-group-item list-group-item-action flex-column align-items-start">
-              <div class="d-flex w-100 justify-content-between">
-                <h5 class="mb-1">List group item heading</h5>
-              </div>
-              <p class="mb-1">Donec id elit non mi porta gravida at eget metus. Maecenas sed diam eget risus varius blandit.</p>
-              <small class="text-muted">Donec id elit non mi porta.</small>
-            </a>
-          </div>
+  
+<div class="container bootdey">
+    <div class="col-md-3 mb-3 ml-0">
+        <section class="panel">
+            <div class="panel-body">
+              <form method="get" action="/products" class="form-inline">
+                <div class="form-group ml-0 mb-2">
+                  <label for="inputSearch" class="sr-only">Szukaj produktu</label>
+                  <input type="text" name="search" class="form-control" id="inputSearch" placeholder="Nazwa produktu...">
+                  <button type="submit" class="btn btn-primary ml-2">Wyszukaj produkt</i></button>
+                </div>
+              </form>
+            </div>
+        </section>
     </div>
+    <div class="col-md-12">
+        <div class="row product-list">
+          <% if(products.length == 0) {  %>
+            <div class="alert alert-warning" role="alert">
+              Nie znaleziono takich produktów!
+            </div>
+          <%}%>
+          <% for (product of products) { %>
+            <div class="col-md-4">
+                <section class="panel">
+                    <div class="pro-img-box">
+                        <a href="product/<%= product.id %>">
+                          <img src="https://via.placeholder.com/250x220/FFB6C1/000000" alt="" />
+                        </a>
+                        <a href="#" class="adtocart">
+                            <i class="fa fa-shopping-cart"></i>
+                        </a>
+                    </div>
+                    <div class="panel-body text-center">
+                        <h4>
+                            <a href="#" class="pro-title">
+                                <%=product.name %>
+                            </a>
+                        </h4>
+                        <p class="price"><%= product.price.toFixed(2) %> PLN</p>
+                    </div>
+                </section>
+            </div>
+          <%}%>
+        </div>
+    </div>
+</div>
 </main>
 <footer>
   <%- include('../partials/footer'); %>

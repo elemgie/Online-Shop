@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <%- include('../partials/head', {title: "Strona Główna"}); %>
+</head>
+<body>
+<header>
+  <%- include('../partials/header'); %>
+</header>
+<style>
+.content-wrapper {
+	max-width: 1140px;
+	background: #fff;
+	margin: 0 auto;
+	margin-top: 25px;
+	margin-bottom: 10px;
+	border: 0px;
+	border-radius: 0px;
+}
+
+.container-fluid{
+	max-width: 1140px;
+	margin: 0 auto;
+}
+
+.container {
+	padding-left: 0px;
+	padding-right: 0px;
+	max-width: 100%;
+}
+</style>
+<main>
+    <div class="container-fluid">
+        <div class="content-wrapper">	
+            <div class="item-container">	
+                <div class="container">	
+                    <div class="col-md-12" style="padding-left: 0">
+                        <div class="product col-md-3 service-image-left">
+                            <img class="mb-5" id="item-display" src="http://placekitten.com/2000/1200" alt=""></img>
+                        </div>
+                    </div>
+                    <div class="col-md-7">
+                        <div class="display-4"><%= product.name %></div>
+                        <hr>
+                        <div class="product-price"><%= product.price.toFixed(2) %> PLN</div>
+                        <% if(product.quantity == 0) { %><div style="color: red"><% } else { %><div style="color: green"><% }%> <%= product.quantity == 0 ? "Niedostępny" : "Dostępny" %> (<%= product.quantity %> szt.)</div>
+                        <hr>
+                        <div class="btn-group cart">
+                            <button type="button" class="btn btn-success">
+                                Dodaj do koszyka 
+                            </button>
+                        </div>
+                    </div>
+                </div> 
+            </div>
+            <div class="container-fluid">		
+                <div class="col-md-12 product-info">
+                    <section class="container product-info">
+                        <%= product.description %>
+                    </section>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+<footer>
+  <%- include('../partials/footer'); %>
+</footer>
+
+</body>
+</html>

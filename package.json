@@ -21,9 +21,12 @@
   "homepage": "https://github.com/elemgie/online-shop#readme",
   "dependencies": {
     "bcrypt": "^5.0.1",
+    "cookie-parser": "^1.4.6",
     "ejs": "^3.1.6",
     "express": "^4.17.2",
+    "express-session": "^1.17.2",
     "sequelize": "^6.15.0",
+    "session": "^0.1.0",
     "sqlite3": "^5.0.2"
   }
 }
