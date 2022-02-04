@@ -19,13 +19,20 @@
                 </li>
             </ul>
         </div>
-
+        <% if(username) { %>
+            <div class="collapse navbar-collapse" id="account">
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item"><a class="nav-link" href="/profile">Witaj <%= username %></a></li>
+                    <li class="nav-item"><a class="nav-link" href="/logout">Wyloguj</a></li>
+                </ul>
+            </div>
+        <%} else {%>
         <div class="collapse navbar-collapse" id="account">
             <ul class="navbar-nav ml-auto">
                 <li class="nav-item"><a class="nav-link" href="/register">Zarejestruj</a></li>
                 <li class="nav-item"><a class="nav-link" href="/login">Zaloguj</a></li>
             </ul>
         </div>
-
+        <% } %>
     </div>
 </nav>
