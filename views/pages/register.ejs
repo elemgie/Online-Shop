@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <%- include('../partials/head', {title: "Strona Główna"}); %>
+</head>
+<body>
+<header>
+  <%- include('../partials/header'); %>
+</header>
+
+<main>
+
+<div class="container">
+        <form style="padding-top: 50px">
+            <div class="form-group">
+                <label for="username">Nazwa użytkownika</label>
+                <input type="text" class="form-control" id="username" name="username" aria-describedby="usernameHelp" placeholder="jankowalski00">
+            </div>
+            <div class="form-group">
+                <label for="email">E-mail</label>
+                <input type="email" class="form-control" id="email" name="email" aria-describedby="emailHelp" placeholder="jan.kowalski@przyklad.pl">
+                <small id="usernameHelp" class="form-text text-muted">Nikomu nie udostępnimy Twojego adresu e-mail.</small>
+            </div>
+            <div class="form-group">
+                <label for="confirm_email">Potwierdź e-mail</label>
+                <input type="email" class="form-control" id="confirm_email" name="confirm_email" aria-describedby="emailHelp" placeholder="jan.kowalski@przyklad.pl">
+              </div>
+            <div class="form-group">
+              <label for="password">Hasło</label>
+              <input type="password" class="form-control" id="password" name="password" placeholder="Hasło">
+            </div>
+            <div class="form-group">
+                <label for="confirm_password">Potwierdź hasło</label>
+                <input type="password" class="form-control" id="confirm_password" name="confirm_password" placeholder="Password">
+              </div>
+            <button type="submit" class="btn btn-primary">Zarejestruj</button>
+          </form>
+</div>
+
+</main>
+
+<footer>
+  <%- include('../partials/footer'); %>
+</footer>
+
+</body>
+</html>

@@ -10,18 +10,48 @@
 
 <main>
 
-<div class="container" id="main-container">
-
-<div class="jumbotron">
-    <h1 class="display-4">Witamy na stronie sklepu!</h1>
-    <p class="lead">This is a simple hero unit, a simple jumbotron-style component for calling extra attention to featured content or information.</p>
-    <hr class="my-4">
-    <p>Zapraszamy do zapoznania się z ofertą sklepu.</p>
-    <a class="btn btn-primary btn-lg" href="/products" role="button">Oferta</a>
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="carousel slide" id="main-carousel">
+                <ol class="carousel-indicators">
+                    <li data-slide-to="0" data-target="#main-carousel"> </li>
+                    <li data-slide-to="1" data-target="#main-carousel"> </li>
+                    <li data-slide-to="2" data-target="#main-carousel" class="active"> </li>
+                </ol>
+                <div class="carousel-inner">
+                    <div class="carousel-item"> <img class="d-block w-100" alt="Pierwsze zdjęcie" src="/images/main-carousel/1.jpg" />
+                        <div class="carousel-caption">
+                            <h4> Najlepsze produkty na rynku </h4>
+                            <p>Zapraszamy do zapoznania się z ofertą naszego sklepu.</p>
+                        </div>
+                    </div>
+                    <div class="carousel-item"> <img class="d-block w-100" alt="Drugie zdjęcie" src="/images/main-carousel/2.jpg" />
+                        <div class="carousel-caption">
+                            <h4>Zawsze niskie ceny</h4>
+                            <p>Filarami strategii firmy są starannie wyselekcjonowane produkty najwyższej jakości, oferowane w codziennie niskich cenach.</p>
+                        </div>
+                    </div>
+                    <div class="carousel-item active"> <img class="d-block w-100" alt="Trzecie zdjęcie" src="/images/main-carousel/3.jpg" />
+                        <div class="carousel-caption">
+                            <h4>Profesjonalna obsługa</h4>
+                            <p>Nasi Doradcy Biznesowi przygotują specjalną ofertę dla twojej firmy. Posiadamy różne produkty i usługi biznesowe, skierowane szczególnie dla dużego rynku biznesowego, instytucji czy przedsiębiorców.</p>
+                        </div>
+                    </div>
+                </div> <a class="carousel-control-prev" href="#main-carousel" data-slide="prev"><span class="carousel-control-prev-icon"></span> <span class="sr-only">Poprzedni</span></a> <a class="carousel-control-next" href="#main-carousel" data-slide="next"><span class="carousel-control-next-icon"></span> <span class="sr-only">Nastęþny</span></a>
+            </div>
+        </div>
+    </div>
+    <div class="jumbotron jumbotron-fluid">
+        <div class="container">
+          <h1 class="display-4">Zarpaszamy do zapoznania się z ofertą</h1>
+          <hr class="my-4">
+          <p class="lead">Nasz obszerny katalog produktów zapewni wszystko czego państwo szukają</p>
+          <a class="btn btn-secondary btn-lg" href="/products" role="button">Przeglądaj produkty</a>
+        </div>
+      </div>
 </div>
 
-
-</div>
 </main>
 
 <footer>
