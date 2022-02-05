@@ -223,7 +223,7 @@ const deleteProduct = async (prodId) => {
   }});
   return {success: true, message: "Przedmiot został usunięty"};
 }
-
+// checknij zamówienie że done
 const updateProductQuantity = async (prodId, newQuantity) => {
   const prod = await Product.findAll({where: {
     id: prodId
@@ -251,6 +251,7 @@ const addOrder = async (userID, productList) => {
     prod = prod[0];
     await OrderProduct.create({productId: prod.id, orderId: orderID, quantity: prod.quantity});
   }
+  // dopisać aktualke quantity w bazie
   return 0;
 }
 
