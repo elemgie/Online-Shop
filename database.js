@@ -11,7 +11,8 @@ async function dbInit(){
   // establishing connection
   const sequelize = new Sequelize({
     dialect: 'sqlite',
-    storage: './db/database'
+    storage: './db/database',
+    omitNull: true
   });
   db = sequelize;
   // creating tables
@@ -102,12 +103,6 @@ async function dbInit(){
   }, {sequelize});
   
   OrderProduct.init({
-    productId: {
-      type: DataTypes.INTEGER,
-    },
-    orderId: {
-      type: DataTypes.INTEGER,
-    },
     quantity: {
       type: DataTypes.INTEGER,
       allowNull: false,
@@ -122,8 +117,8 @@ async function dbInit(){
       name: 'userId'
     }
   });
-  Product.belongsToMany(Order, {foreignKey: {name: 'id'}, through: OrderProduct});
-  Order.belongsToMany(Product, {foreignKey: {name: 'id'}, through: OrderProduct});
+  Product.belongsToMany(Order, {foreignKey: 'productId', through: OrderProduct});
+  Order.belongsToMany(Product, {foreignKey: 'orderId', through: OrderProduct});
   
   await sequelize.sync();
 };
@@ -157,9 +152,9 @@ async function authenticate_async(usernameForm, passwordForm){
     }
   });
   if(req.length === 0)
-    return {success: false, message: "Nie ma takiego użytkownika"}; 
+    return {success: false, message: "Błędna nazwa użytkownika lub hasło"}; 
   let result = bcrypt.compareSync(passwordForm, req[0].passwordHash);
-  return {success: result, message: (result) ? "Zalogowano pomyślnie" : "Błędna nazwa użytkownika lub hasło"};
+  return {success: result, message: (result) ? "Zalogowano pomyślnie" : "Błędna nazwa użytkownika lub hasło", id: req[0].id};
 }
 
 const authenticate = async (usernameForm, passwordForm) => { return await authenticate_async(usernameForm, passwordForm); }
@@ -181,7 +176,7 @@ const deleteUser = async (userId) =>  {
   {
     id: userId
   }});
-  return true;
+  return {success: true, message: "Użytkownik pomyślnie usunięty"};
 }
 
 const getUserList = async () => {
@@ -210,20 +205,23 @@ const getProduct = async (productId) =>
 }
 
 const addProduct = async (nameForm, descForm, priceForm, quantForm) => {
+  if(nameForm === '' || descForm === '' || priceForm === '' || quantForm == '')
+    return {success: false, message: "Podaj poprawne dane"};
   await Product.create({name: nameForm, description: descForm, price: priceForm, quantity: quantForm });
+  return {success: true, message: "Produkt pomyślnie dodany"};
 }
 
 const deleteProduct = async (prodId) => {
   const prod = await Product.findAll({where: {
     id: prodId
   }});
-  if(prod.size === 0) // no such user
-    return false;
+  if(prod.size === 0) // no such entry
+    return {success: false, message: "Próbujesz usunąć nieistniejący przedmiot"};
   Product.destroy({where:
   {
     id: prodId
   }});
-  return true;
+  return {success: true, message: "Przedmiot został usunięty"};
 }
 
 const updateProductQuantity = async (prodId, newQuantity) => {
@@ -231,12 +229,12 @@ const updateProductQuantity = async (prodId, newQuantity) => {
     id: prodId
   }});
   if(newQuantity < 0 || prod.size === 0)
-    return false;
+    return {success: false, message: "Produkt nie istnieje bądź podano ujemną wartość"};
   await Product.update({quantity: newQuantity}, {where:
   {
     id: prodId
   }});
-  return true;
+  return {success: true, message: "Pomyślnie zmieniono wartość"};
 }
 
 const addOrder = async (userID, productList) => {
@@ -251,7 +249,7 @@ const addOrder = async (userID, productList) => {
   let orderID = orderRes.dataValues.id;
   for(let prod of productList){
     prod = prod[0];
-    await OrderProduct.create({prodId: prod.id, orderId: orderID, quantity: prod.quantity});
+    await OrderProduct.create({productId: prod.id, orderId: orderID, quantity: prod.quantity});
   }
   return 0;
 }
@@ -262,34 +260,16 @@ const getOrderList = async () => {
 
 const getOrder = async (orderID) => 
 {
-  let res = await OrderProduct.findAll({ where:
+  let res = await Order.findAll({ where:
   {
-    orderId: orderID
+    id: orderID
   },
-  include: {
-    model: Product
-  },
-  raw: true});
-  console.log(res);
+  raw: true,
+  include: [
+  {
+    model: Product,
+  }]});
+  return res;
 }
-
-(async function(){
-  try{
-    await dbInit();
-    await db.authenticate();
-    // console.log("Connected successfully");
-    // await addProduct("Marchewka", "Takie pomarańczowe warzywo", 10.50, 30);
-    // await addProduct("Wódka", "Napój bogów", 50.00, 10);
-    // await addUser("Janusz", "janusz@januszex.com", "12345");
-    // await addOrder(1, new Array(await getProduct(1), await getProduct(2)));
-    //const januszOrder = await getOrder(1);
-    // console.log(januszOrder);
-    console.log(await addUser("", "ora@labora.pl", "",));
-  }
-  catch (err){
-    console.log("FUCKED UP!");
-    console.log(err);
-  }
-})();
 
 module.exports = {dbInit, addUser, deleteUser, getUserList, getUser, isAdmin, authenticate, getProductList, getProduct, addProduct, deleteProduct, updateProductQuantity, addOrder, getOrderList, getOrder}
