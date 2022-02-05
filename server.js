@@ -23,25 +23,40 @@ const oneDay = 1000 * 60 * 60 * 24;
 
   app.use( express.static( "public" ) );
   app.set('view engine', 'ejs');
+  app.use(function(req, res, next) {
+    res.locals.username = req.session.username;
+    next();
+  });
 
   app.get('/', function(req, res) {
-    res.render('pages/index');
+    session = req.session;
+    res.render('pages/index',{
+      username: session.userid
+    });
   });
 
   app.get('/register', function(req, res) {
       res.render('pages/register',{
-        errors: req.query.err
+        error: req.query.err
       });
     });
     
   app.post('/register', async(req,res) => {
       try{
         const body = req.body;
+        if(body.password != body.confirm_password){
+          res.redirect(`/register?err=${encodeURIComponent("Podane hasła nie są identyczne!")}`);
+          return;
+        }
+        if(body.email != body.confirm_email){
+          res.redirect(`/register?err=${encodeURIComponent("Podane adresy e-mail nie są identyczne!")}`);
+          return;
+        }
         const ret = await db.addUser(body.username, body.email, body.password, false);
-        if(ret){
-          res.redirect(`/register?err=${encodeURIComponent(ret)}`);
-        } else {
+        if(ret.success){
           res.redirect('/login?p=registration')
+        } else {
+          res.redirect(`/register?err=${encodeURIComponent(ret.message)}`);
         }
       } catch {
         res.redirect('/register?err=validationerror');
@@ -49,19 +64,26 @@ const oneDay = 1000 * 60 * 60 * 24;
   })
 
   app.get('/login', function(req, res) {
-      res.render('pages/login');
+      res.render('pages/login',{
+        error: req.query.err
+      });
+  });
+
+  app.get('/logout', function(req, res) {
+     req.session.destroy();
+     res.redirect('/');  
   });
 
   app.post('/login', async(req,res) => {
       const body = req.body;
       const ret = await db.authenticate(body.username, body.password);
       console.log(ret);
-      if(ret){
-        res.redirect(`/login?err=${encodeURIComponent(ret)}`);
-      } else {
+      if(ret.success){
         session=req.session;
         session.userid=req.body.username;
         res.redirect('/?p=login');
+      } else {
+        res.redirect(`/login?err=${encodeURIComponent(ret.message)}`);
       }
   });
 
