@@ -12,7 +12,8 @@ async function dbInit(){
   const sequelize = new Sequelize({
     dialect: 'sqlite',
     storage: './db/database',
-    omitNull: true
+    omitNull: true,
+    logging: false // for debugging SQL queries output set it to true!
   });
   db = sequelize;
   // creating tables
@@ -167,9 +168,9 @@ const isAdmin = async (userId) => {
 }
 
 const deleteUser = async (userId) =>  {
-  const user = await User.findAll({where: {
+  const user = (await User.findAll({where: {
     id: userId
-  }});
+  }}))[0];
   if(user.size === 0) // no such user
     return false;
   User.destroy({where:
@@ -184,10 +185,11 @@ const getUserList = async () => {
 }
 
 const getUser = async (userId) => {
-  return await User.findAll({where:
+  let res = await User.findAll({where:
   {
     id: userId
   }, raw: true});
+  return res[0];
 }
 
 const getProductList = async () => {
@@ -198,10 +200,11 @@ const getProductList = async () => {
 
 const getProduct = async (productId) => 
 {
-  return await Product.findAll({raw: true, where:
+  let res = await Product.findAll({raw: true, where:
   {
     id: productId
   }});
+  return res[0];
 }
 
 const addProduct = async (nameForm, descForm, priceForm, quantForm) => {
@@ -212,9 +215,9 @@ const addProduct = async (nameForm, descForm, priceForm, quantForm) => {
 }
 
 const deleteProduct = async (prodId) => {
-  const prod = await Product.findAll({where: {
+  const prod = (await Product.findAll({where: {
     id: prodId
-  }});
+  }}))[0];
   if(prod.size === 0) // no such entry
     return {success: false, message: "Próbujesz usunąć nieistniejący przedmiot"};
   Product.destroy({where:
@@ -223,36 +226,42 @@ const deleteProduct = async (prodId) => {
   }});
   return {success: true, message: "Przedmiot został usunięty"};
 }
-// checknij zamówienie że done
+
 const updateProductQuantity = async (prodId, newQuantity) => {
-  const prod = await Product.findAll({where: {
+  const prod = (await Product.findAll({where: {
     id: prodId
-  }});
+  }}))[0];
   if(newQuantity < 0 || prod.size === 0)
-    return {success: false, message: "Produkt nie istnieje bądź podano ujemną wartość"};
+  return {success: false, message: "Produkt nie istnieje bądź podano ujemną wartość"};
   await Product.update({quantity: newQuantity}, {where:
-  {
-    id: prodId
-  }});
-  return {success: true, message: "Pomyślnie zmieniono wartość"};
+    {
+      id: prodId
+    }});
+    return {success: true, message: "Pomyślnie zmieniono wartość"};
+  }
+  
+  const addOrder = async (userID, productList) => {
+    let sum = 0.0;
+    for(let prod of productList) {
+      if(prod.quantity > (await Product.findAll({where: {id: prod.id}, raw: true}))[0].quantity)
+      return prod.id;
+      sum += prod.price;
+    };
+    let orderRes = await Order.create({userId: userID, total: sum});
+    let orderID = orderRes.dataValues.id;
+    for(let prod of productList){
+      await OrderProduct.create({productId: prod.id, orderId: orderID, quantity: prod.quantity});
+      await Product.update({quantity: await db.literal(`quantity - ${prod.quantity}`)}, {where:{
+        id: prod.id
+      }});
+  }
+  return 0;
 }
 
-const addOrder = async (userID, productList) => {
-  let sum = 0.0;
-  for(let prod of productList) {
-    prod = prod[0];
-    if(prod.quantity > await Product.findAll({where: {id: prod.id}, raw: true}).quantity)
-      return prod.id;
-    sum += prod.price;
-  };
-  let orderRes = await Order.create({userId: userID, total: sum});
-  let orderID = orderRes.dataValues.id;
-  for(let prod of productList){
-    prod = prod[0];
-    await OrderProduct.create({productId: prod.id, orderId: orderID, quantity: prod.quantity});
-  }
-  // dopisać aktualke quantity w bazie
-  return 0;
+const fulfillOrder = async (orderID) => {
+  await Order.update({isFulfilled: true}, {where: {
+    orderId: orderID
+  }});
 }
 
 const getOrderList = async () => {
@@ -270,7 +279,7 @@ const getOrder = async (orderID) =>
   {
     model: Product,
   }]});
-  return res;
+  return res[0];
 }
 
-module.exports = {dbInit, addUser, deleteUser, getUserList, getUser, isAdmin, authenticate, getProductList, getProduct, addProduct, deleteProduct, updateProductQuantity, addOrder, getOrderList, getOrder}
+module.exports = {dbInit, addUser, deleteUser, getUserList, getUser, isAdmin, authenticate, getProductList, getProduct, addProduct, deleteProduct, updateProductQuantity, addOrder, fulfillOrder, getOrderList, getOrder}
