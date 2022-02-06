@@ -28,7 +28,26 @@
 	padding-right: 0px;
 	max-width: 100%;
 }
+.disabled {
+    cursor: not-allowed;
+}
 </style>
+<script>
+    const addToCart = (productId) =>{
+        if(<%=!!cart%>){
+            // add simple ajax fetch to something like /product/getquantity here
+            // and pull from that to check if can add to cart
+            if(!productAvailable){
+                $("#add_to_cart").removeClass("btn-success");
+                $("#add_to_cart").addClass("btn-secondary");
+                $("#add_to_cart").addClass("disabled");
+            }
+            fetch(`/product/addtocart/${productId}`)
+            .then(response => response.json())
+            .then(data => console.log(data));
+        }
+    } 
+</script>
 <main>
     <div class="container-fluid container-fluid-product">
         <div class="content-wrapper content-wrapper-product">	
@@ -46,9 +65,10 @@
                         <% if(product.quantity == 0) { %><div style="color: red"><% } else { %><div style="color: green"><% }%> <%= product.quantity == 0 ? "Niedostępny" : "Dostępny" %> (<%= product.quantity %> szt.)</div>
                         <hr>
                         <div class="btn-group cart">
-                            <button type="button" class="btn btn-success">
-                                Dodaj do koszyka 
+                            <button onclick="addToCart(<%= product.id %>)" type="button" id="add_to_cart" class="btn btn-success">
+                                    Dodaj do koszyka 
                             </button>
+                            <p>W koszyku: </p>
                         </div>
                     </div>
                 </div> 
