@@ -110,6 +110,26 @@ const oneDay = 1000 * 60 * 60 * 24;
     });
   });
 
+  app.get('/product/:id/getquantity', function(req, res) {
+    try {
+      const product = getProductById(req.params.id);
+      res.end(JSON.stringify({
+        status: 0,
+        message: "",
+        quantity: {
+          productQuantity: product.quantity,
+          inCart: req.session.cart[product.id] ? req.session.cart[product.id] : 0
+        }
+      }));
+    } catch (error){
+      res.end(JSON.stringify({
+        status: 1,
+        message: error.message,
+        quantity: 0
+      }));
+    }
+  });
+
   app.get('/product/addtocart/:id', function(req,res){
     try {
       session = req.session;
@@ -141,4 +161,3 @@ const oneDay = 1000 * 60 * 60 * 24;
   console.log(`Listening on http://127.0.0.1:${port}`);
   
 })()
-

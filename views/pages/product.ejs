@@ -29,22 +29,30 @@
 	max-width: 100%;
 }
 .disabled {
-    cursor: not-allowed;
+    cursor: not-allowed !important;
 }
 </style>
 <script>
     const addToCart = (productId) =>{
         if(<%=!!cart%>){
-            // add simple ajax fetch to something like /product/getquantity here
-            // and pull from that to check if can add to cart
-            if(!productAvailable){
-                $("#add_to_cart").removeClass("btn-success");
-                $("#add_to_cart").addClass("btn-secondary");
-                $("#add_to_cart").addClass("disabled");
-            }
-            fetch(`/product/addtocart/${productId}`)
-            .then(response => response.json())
-            .then(data => console.log(data));
+            fetch(`/product/${productId}/getquantity`)
+                    .then(response => response.json())
+                    .then(data => {
+                        const productAvailable = data.quantity.productQuantity > data.quantity.inCart;
+                        if(!productAvailable){
+                            const button = $("#add_to_cart"); 
+                            button.removeClass("btn-success");
+                            button.addClass("btn-secondary");
+                            button.addClass("disabled");
+                            button.attr({
+                                onclick: ""
+                            })
+                        } else {
+                            fetch(`/product/addtocart/${productId}`)
+                            .then(response => response.json())
+                            .then(data => console.log(data));
+                        }
+                    });
         }
     } 
 </script>
@@ -68,7 +76,6 @@
                             <button onclick="addToCart(<%= product.id %>)" type="button" id="add_to_cart" class="btn btn-success">
                                     Dodaj do koszyka 
                             </button>
-                            <p>W koszyku: </p>
                         </div>
                     </div>
                 </div> 
