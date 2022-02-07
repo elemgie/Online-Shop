@@ -7,6 +7,39 @@
 <header>
   <%- include('../partials/header'); %>
 </header>
+<script>
+  const addToCart = (productId) =>{
+      if(<%=!!cart%>){
+          fetch(`/product/${productId}/getquantity`)
+                  .then(response => response.json())
+                  .then(data => {
+                      const productAvailable = data.quantity.productQuantity > data.quantity.inCart;
+                      if(!productAvailable){
+                          const button = $(`#addToCart${productId}`); 
+                          button.removeClass("btn-success");
+                          button.addClass("btn-secondary");
+                          button.addClass("disabled");
+                          button.attr({
+                              onclick: ""
+                          });
+                                                                                           } else {
+                          fetch(`/product/addtocart/${productId}`)
+                          .then(response => response.json())
+                          .then(data => {console.log(data)});
+                        }
+                        $(`#in_cart${productId}`).text(data.quantity.inCart);
+                      });
+      }
+  } 
+</script>
+<style>
+.adtocart{
+  cursor: pointer;
+}
+.disabled {
+  cursor: not-allowed;
+}
+</style>
 <main>
   
 <div class="container bootdey">
@@ -33,11 +66,11 @@
           <% for (product of products) { %>
             <div class="col-md-4">
                 <section class="panel">
-                    <div class="pro-img-box">
+                    <div class="pro-img-box mb-3">
                         <a href="product/<%= product.id %>">
                           <img src="https://via.placeholder.com/250x220/FFB6C1/000000" alt="" />
                         </a>
-                        <a href="#" class="adtocart">
+                        <a onclick="addToCart(<%=product.id%>)" id="addToCart<%=product.id%>" class="adtocart">
                             <i class="fa fa-shopping-cart"></i>
                         </a>
                     </div>
@@ -47,6 +80,9 @@
                                 <%=product.name %>
                             </a>
                         </h4>
+                        <% if(cart) { %>
+                          <p>W koszyku: <span id="in_cart<%=product.id%>"><%=cart[product.id] ? cart[product.id] : 0%></span></p>
+                        <%}%>
                         <p class="price"><%= product.price.toFixed(2) %> PLN</p>
                     </div>
                 </section>

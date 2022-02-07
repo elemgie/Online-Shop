@@ -93,15 +93,26 @@ const oneDay = 1000 * 60 * 60 * 24;
   app.get('/products', function(req, res) {
     if(req.query.search && req.query.search != ""){
       res.render('pages/products', {
-        products: productList.filter(product => product.name.toLowerCase().indexOf(req.query.search.toLowerCase()) != -1)
+        products: productList.filter(product => product.name.toLowerCase().indexOf(req.query.search.toLowerCase()) != -1),
+        cart: req.session.cart
       });
     } else {
       res.render('pages/products', {
-        products: productList
+        products: productList,
+        cart: req.session.cart
       });
     }
     
   });
+
+  app.get('/cart', function(req, res) {
+      res.render('pages/cart', {
+        products: productList,
+        getProductById: getProductById,
+        cart: req.session.cart
+    });
+  });
+
 
   app.get('/product/:id', function(req, res) {
     res.render('pages/product',{

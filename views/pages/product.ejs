@@ -52,6 +52,7 @@
                             .then(response => response.json())
                             .then(data => console.log(data));
                         }
+                        $("#cartAmount").text(data.quantity.inCart);
                     });
         }
     } 
@@ -76,6 +77,7 @@
                             <button onclick="addToCart(<%= product.id %>)" type="button" id="add_to_cart" class="btn btn-success">
                                     Dodaj do koszyka 
                             </button>
+                            <span class="ml-3" style="padding-top: 10px">W koszyku: <span id="cartAmount"><%=cart[product.id] ? cart[product.id] : 0%></span>/<%=product.quantity%>szt.</span>
                         </div>
                     </div>
                 </div> 
@@ -90,6 +92,25 @@
         </div>
     </div>
 </main>
+<script>
+    if(<%=!!cart%>){
+        fetch(`/product/<%=product.id%>/getquantity`)
+                .then(response => response.json())
+                    .then(data => {
+                        const productAvailable = data.quantity.productQuantity > data.quantity.inCart;
+                        if(!productAvailable){
+                            const button = $("#add_to_cart"); 
+                            button.removeClass("btn-success");
+                            button.addClass("btn-secondary");
+                            button.addClass("disabled");
+                            button.attr({
+                                onclick: ""
+                            })
+                            $("#cartAmount").text(data.quantity.inCart);
+                        }
+                    });
+        }
+</script>
 <footer>
   <%- include('../partials/footer'); %>
 </footer>
