@@ -28,7 +28,35 @@
 	padding-right: 0px;
 	max-width: 100%;
 }
+.disabled {
+    cursor: not-allowed !important;
+}
 </style>
+<script>
+    const addToCart = (productId) =>{
+        if(<%=!!cart%>){
+            fetch(`/product/${productId}/getquantity`)
+                    .then(response => response.json())
+                    .then(data => {
+                        const productAvailable = data.quantity.productQuantity > data.quantity.inCart;
+                        if(!productAvailable){
+                            const button = $("#add_to_cart"); 
+                            button.removeClass("btn-success");
+                            button.addClass("btn-secondary");
+                            button.addClass("disabled");
+                            button.attr({
+                                onclick: ""
+                            })
+                        } else {
+                            fetch(`/product/addtocart/${productId}`)
+                            .then(response => response.json())
+                            .then(data => console.log(data));
+                        }
+                        $("#cartAmount").text(data.quantity.inCart);
+                    });
+        }
+    } 
+</script>
 <main>
     <div class="container-fluid container-fluid-product">
         <div class="content-wrapper content-wrapper-product">	
@@ -46,9 +74,10 @@
                         <% if(product.quantity == 0) { %><div style="color: red"><% } else { %><div style="color: green"><% }%> <%= product.quantity == 0 ? "Niedostępny" : "Dostępny" %> (<%= product.quantity %> szt.)</div>
                         <hr>
                         <div class="btn-group cart">
-                            <button type="button" class="btn btn-success">
-                                Dodaj do koszyka 
+                            <button onclick="addToCart(<%= product.id %>)" type="button" id="add_to_cart" class="btn btn-success">
+                                    Dodaj do koszyka 
                             </button>
+                            <span class="ml-3" style="padding-top: 10px">W koszyku: <span id="cartAmount"><%=cart[product.id] ? cart[product.id] : 0%></span>/<%=product.quantity%>szt.</span>
                         </div>
                     </div>
                 </div> 
@@ -63,6 +92,25 @@
         </div>
     </div>
 </main>
+<script>
+    if(<%=!!cart%>){
+        fetch(`/product/<%=product.id%>/getquantity`)
+                .then(response => response.json())
+                    .then(data => {
+                        const productAvailable = data.quantity.productQuantity > data.quantity.inCart;
+                        if(!productAvailable){
+                            const button = $("#add_to_cart"); 
+                            button.removeClass("btn-success");
+                            button.addClass("btn-secondary");
+                            button.addClass("disabled");
+                            button.attr({
+                                onclick: ""
+                            })
+                            $("#cartAmount").text(data.quantity.inCart);
+                        }
+                    });
+        }
+</script>
 <footer>
   <%- include('../partials/footer'); %>
 </footer>

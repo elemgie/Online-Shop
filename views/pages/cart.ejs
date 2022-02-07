@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <%- include('../partials/head', {title: "Strona Główna"}); %>
+</head>
+<body>
+<header>
+  <%- include('../partials/header'); %>
+</header>
+
+<main>
+
+<div class="container">
+    <ul class="list-group">
+        <%for(const [productId, inCart] of Object.entries(products)) { %>
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+          <%= getProductById(productId).name %>
+          <span class="badge badge-primary badge-pill"><%=inCart%></span>
+        </li>
+        <% }%>
+    </ul>
+</div>
+
+</main>
+
+<footer>
+  <%- include('../partials/footer'); %>
+</footer>
+
+</body>
+</html>

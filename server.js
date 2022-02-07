@@ -25,13 +25,14 @@ const oneDay = 1000 * 60 * 60 * 24;
   app.set('view engine', 'ejs');
   app.use(function(req, res, next) {
     res.locals.username = req.session.username;
+    res.locals.cart = req.session.cart;
     next();
   });
 
   app.get('/', function(req, res) {
     session = req.session;
     res.render('pages/index',{
-      username: session.userid
+      username: session.username
     });
   });
 
@@ -80,7 +81,9 @@ const oneDay = 1000 * 60 * 60 * 24;
       console.log(ret);
       if(ret.success){
         session=req.session;
-        session.userid=req.body.username;
+        session.userid = ret.id;
+        session.username=req.body.username;
+        session.cart = {};
         res.redirect('/?p=login');
       } else {
         res.redirect(`/login?err=${encodeURIComponent(ret.message)}`);
@@ -90,24 +93,82 @@ const oneDay = 1000 * 60 * 60 * 24;
   app.get('/products', function(req, res) {
     if(req.query.search && req.query.search != ""){
       res.render('pages/products', {
-        products: productList.filter(product => product.name.toLowerCase().indexOf(req.query.search.toLowerCase()) != -1)
+        products: productList.filter(product => product.name.toLowerCase().indexOf(req.query.search.toLowerCase()) != -1),
+        cart: req.session.cart
       });
     } else {
       res.render('pages/products', {
-        products: productList
+        products: productList,
+        cart: req.session.cart
       });
     }
     
   });
 
+  app.get('/cart', function(req, res) {
+      res.render('pages/cart', {
+        products: productList,
+        getProductById: getProductById,
+        cart: req.session.cart
+    });
+  });
+
+
   app.get('/product/:id', function(req, res) {
     res.render('pages/product',{
-      product: getProductById(req.params.id)
+      product: getProductById(req.params.id),
+      cart: req.session.cart
     });
+  });
+
+  app.get('/product/:id/getquantity', function(req, res) {
+    try {
+      const product = getProductById(req.params.id);
+      res.end(JSON.stringify({
+        status: 0,
+        message: "",
+        quantity: {
+          productQuantity: product.quantity,
+          inCart: req.session.cart[product.id] ? req.session.cart[product.id] : 0
+        }
+      }));
+    } catch (error){
+      res.end(JSON.stringify({
+        status: 1,
+        message: error.message,
+        quantity: 0
+      }));
+    }
+  });
+
+  app.get('/product/addtocart/:id', function(req,res){
+    try {
+      session = req.session;
+      if(session.cart[req.params.id]){
+        session.cart[req.params.id] += 1;
+      } else {
+        session.cart = {
+          ...session.cart,
+          [req.params.id]: 1
+        }
+      }
+      res.setHeader('Content-Type', 'application/json');
+      res.end(JSON.stringify({
+        status: 0,
+        message: "",
+        currentCart: session.cart
+      }));
+    } catch (error) {
+      res.end(JSON.stringify({
+        status: 1,
+        message: error.message
+      }));
+    }
+    
+    res.end();
   });
 
   app.listen(port);
   console.log(`Listening on http://127.0.0.1:${port}`);
   
 })()
-
