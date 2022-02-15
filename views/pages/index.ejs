@@ -9,7 +9,13 @@
 </header>
 
 <main>
-<div class="container-fluid">
+
+    <div class="container-fluid">
+    <% if(order){ %>
+        <script>
+            alert("Poprawnie złożono zamówienie");
+        </script>
+    <% } %>
     <div class="row">
         <div class="col-md-12">
             <div class="carousel slide" id="main-carousel">

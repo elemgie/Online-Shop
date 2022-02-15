@@ -2,15 +2,14 @@ const express = require('express');
 const app = express();
 const cookieParser = require("cookie-parser");
 const sessions = require('express-session');
-const db = require('./database');
+const db = require('./database.js');
 const port = 8080;
 const oneDay = 1000 * 60 * 60 * 24;
 
 (async () => {
   await db.dbInit();
-  const productList = await db.getProductList();
-  const getProductById = id => productList.filter(obj => obj.id == id)[0];
   var session;
+
 
   app.use(express.json());
   app.use(express.urlencoded({ extended: true }));
@@ -32,7 +31,8 @@ const oneDay = 1000 * 60 * 60 * 24;
   app.get('/', function(req, res) {
     session = req.session;
     res.render('pages/index',{
-      username: session.username
+      username: session.username,
+      order: req.query.order
     });
   });
 
@@ -78,7 +78,6 @@ const oneDay = 1000 * 60 * 60 * 24;
   app.post('/login', async(req,res) => {
       const body = req.body;
       const ret = await db.authenticate(body.username, body.password);
-      console.log(ret);
       if(ret.success){
         session=req.session;
         session.userid = ret.id;
@@ -90,7 +89,9 @@ const oneDay = 1000 * 60 * 60 * 24;
       }
   });
 
-  app.get('/products', function(req, res) {
+  app.get('/products', async function(req, res) {
+    const productList = await db.getProductList();
+    const getProductById = id => productList.filter(obj => obj.id == id)[0];
     if(req.query.search && req.query.search != ""){
       res.render('pages/products', {
         products: productList.filter(product => product.name.toLowerCase().indexOf(req.query.search.toLowerCase()) != -1),
@@ -105,24 +106,44 @@ const oneDay = 1000 * 60 * 60 * 24;
     
   });
 
-  app.get('/cart', function(req, res) {
+  app.get('/cart', async function(req, res) {
+    if(!req.session.userid)
+      res.redirect('/');
+    const productList = await db.getProductList();
+    const getProductById = id => productList.filter(obj => obj.id == id)[0];
       res.render('pages/cart', {
         products: productList,
         getProductById: getProductById,
         cart: req.session.cart
     });
+  
+  });
+  
+  app.post('/placeorder', async function (req, res) {
+    const arr = [];
+    for(let [prodID, quantity] of Object.entries(req.session.cart)){
+      let product = await db.getProduct(prodID);
+      product.quantity = quantity;
+      arr.push(product);
+    }
+    await db.addOrder(req.session.userid, arr);
+    req.session.cart = {};
+    res.redirect('/?order=success');
   });
 
-
-  app.get('/product/:id', function(req, res) {
+  app.get('/product/:id', async function(req, res) {
+    const productList = await db.getProductList();
+    const getProductById = id => productList.filter(obj => obj.id == id)[0];
     res.render('pages/product',{
       product: getProductById(req.params.id),
       cart: req.session.cart
     });
   });
 
-  app.get('/product/:id/getquantity', function(req, res) {
+  app.get('/product/:id/getquantity', async function(req, res) {
     try {
+      const productList = await db.getProductList();
+      const getProductById = id => productList.filter(obj => obj.id == id)[0];
       const product = getProductById(req.params.id);
       res.end(JSON.stringify({
         status: 0,
@@ -166,6 +187,22 @@ const oneDay = 1000 * 60 * 60 * 24;
     }
     
     res.end();
+  });
+
+  app.get('/admin', async (req, res) => {
+    const checkAdmin = await db.isAdmin(req.session.userid);
+    if(!req.session.userid)
+      res.redirect('/');
+    else
+      if(checkAdmin)
+        res.render('pages/admin', {session: req.session, added: !!req.query.added});
+      else
+      res.redirect('/');
+  });
+
+  app.post('/admin', async (req,res) => {
+    const result = await db.addProduct(req.body.productname, req.body.productdesc, req.body.price, req.body.productquantity);
+    res.redirect('/admin?added=success');
   });
 
   app.listen(port);

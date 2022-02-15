@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="pl">
+  <head>
+    <%- include('../partials/head', {title: "Panel administracyjny"}); %>
+  </head>
+  <body>
+    <header>
+      <%- include('../partials/header'); %>
+    </header>
+    
+    <div class="container">
+      <h1>Formularz dodawania produktu</h1>
+      <% if(added){ %>
+        <div class="alert alert-success" role="alert">
+          Pomyślnie dodano produkt!
+        </div>
+      <%}%>
+      <form id="productform" action='/admin' method="post">
+      <input type="hidden" name="formtype" value="addproduct" >
+      <div class="form-group row">
+        <label for="productname" class="col-4 col-form-label">Nazwa produktu</label> 
+        <div class="col-8">
+          <input id="productname" name="productname" placeholder="Nazwa..." type="text" class="form-control">
+        </div>
+      </div>
+      <div class="form-group row">
+        <label for="price" class="col-4 col-form-label">Cena produktu</label> 
+        <div class="col-8">
+          <div class="input-group">
+            <div class="input-group-prepend">
+              <div class="input-group-text">
+                <i class="fa fa-money"></i>
+              </div>
+            </div> 
+            <input id="price" name="price" placeholder="0.00" type="text" class="form-control">
+          </div>
+        </div>
+      </div>
+      <div class="form-group row">
+        <label for="productdesc" class="col-4 col-form-label">Opis produktu</label> 
+        <div class="col-8">
+          <textarea id="productdesc" name="productdesc" cols="40" rows="5" class="form-control"></textarea>
+        </div>
+      </div>
+      <div class="form-group row">
+        <label for="productquantity" class="col-4 col-form-label">Dostępność produktu</label> 
+        <div class="col-8">
+          <input id="productquantity" name="productquantity" placeholder="123" type="text" class="form-control">
+        </div>
+      </div> 
+      <div class="form-group row">
+        <div class="offset-4 col-8">
+          <button name="submit" type="submit" class="btn btn-primary">Submit</button>
+        </div>
+      </div>
+    </form>
+  </div>
+  <footer>
+    <%- include('../partials/footer'); %>
+  </footer>
+</body>
+</html>

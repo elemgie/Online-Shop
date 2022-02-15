@@ -12,13 +12,26 @@
 
 <div class="container">
     <ul class="list-group">
-        <%for(const [productId, inCart] of Object.entries(products)) { %>
-        <li class="list-group-item d-flex justify-content-between align-items-center">
-          <%= getProductById(productId).name %>
-          <span class="badge badge-primary badge-pill"><%=inCart%></span>
+        <%let suma = 0.0 %>
+        <%for(const [productId, inCart] of Object.entries(cart)) { %>
+          <li class="list-group-item d-flex" style="position: relative !important; height: 50px">
+          <span style="position: absolute; left: 10px"><%= getProductById(productId).name %></span>
+          <span style="position:absolute; right: 10px">
+          <span class="badge badge-primary mr-2"><%=inCart%></span>
+          <span class="pull-right"><%=(parseFloat(getProductById(productId).price)*inCart).toFixed(2)%> PLN</span>
+          <% suma += parseFloat(getProductById(productId).price)*inCart; %>
+        </span>
         </li>
         <% }%>
     </ul>
+    <span class="btn-success btn disabled pull-right">
+     SUMA: <%= suma.toFixed(2) %> PLN
+    </span>
+  <div style="margin-top:50px">
+    <form action="/placeorder" method="post">  
+      <button class="btn btn-primary pull-right" type="submit">Złóż zamówienie</button>
+    </form>
+  </div>
 </div>
 
 </main>

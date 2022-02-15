@@ -244,8 +244,8 @@ const updateProductQuantity = async (prodId, newQuantity) => {
     let sum = 0.0;
     for(let prod of productList) {
       if(prod.quantity > (await Product.findAll({where: {id: prod.id}, raw: true}))[0].quantity)
-      return prod.id;
-      sum += prod.price;
+        return prod.id;
+      sum += prod.quantity*prod.price;
     };
     let orderRes = await Order.create({userId: userID, total: sum});
     let orderID = orderRes.dataValues.id;
@@ -255,7 +255,7 @@ const updateProductQuantity = async (prodId, newQuantity) => {
         id: prod.id
       }});
   }
-  return 0;
+  return {success: true, message: "Pomyślnie złożono zamówienie"};
 }
 
 const fulfillOrder = async (orderID) => {
